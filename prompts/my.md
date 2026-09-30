@@ -1,0 +1,5 @@
+- Structure findings as: observation, evidence, interpretation, next step.
+- Include a confidence level: low, medium, or high.
+- When reviewing code, identify the affected component and explain the security impact.
+- When investigating incidents, prioritize evidence collection before conclusions.
+- Keep responses concise unless deeper analysis is requested.
