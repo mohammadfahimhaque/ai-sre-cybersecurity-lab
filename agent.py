@@ -48,22 +48,35 @@ bronto = MCPClient(
 )
 
 
+# GitHub MCP gives the agent read-only access to repository/source-code data.
+github = MCPClient(
+    lambda: streamable_http_client(
+        "https://api.githubcopilot.com/mcp/",
+        http_client=httpx2.AsyncClient(
+            headers={
+                "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                "X-MCP-Toolsets": "repos",
+                "X-MCP-Readonly": "true",
+            },
+            timeout=60,
+        ),
+    )
+)
+
+
 def answer(result, reasoning: bool = False) -> str:
     text = str(result).strip()
 
-    if reasoning or not text.startswith("<reasoning>"):
+    if reasoning:
         return text
 
-    if re.search(r"</(reasoning|analysis)>?", text):
-        return re.sub(
-            r"(?s)^.*</(reasoning|analysis)>?",
-            "",
-            text,
-        ).strip()
+    text = re.sub(
+        r"(?is)^\s*<(reasoning|analysis|thinking)>.*?</\1>\s*",
+        "",
+        text,
+    ).strip()
 
-    match = re.search(r"(?m)^(\*\*|#|\|)", text)
-
-    return text[match.start():].strip() if match else text
+    return text
 
 def file_issue(question: str, hypothesis: str) -> str:
     repository = os.environ.get("GITHUB_REPOSITORY")
@@ -106,7 +119,7 @@ def invoke(payload: dict) -> dict:
     agent = Agent(
         model=model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[bronto],
+        tools=[bronto, github],
     )
 
     hypothesis = answer(
