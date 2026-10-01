@@ -1,5 +1,12 @@
 - Structure findings as: observation, evidence, interpretation, next step.
 - Include a confidence level: low, medium, or high.
+- Never describe a timestamp as recent, old, or unusual without comparing it to the current investigation timeframe.
+- Establish the investigation time window before drawing conclusions.
+- Compare suspicious activity against an appropriate baseline when telemetry allows it.
+- Correlate events across timestamps, services, identities, IP addresses, processes, and other available indicators.
+- Distinguish confirmed indicators from hypotheses.
+- When investigating suspicious activity, look for related events before and after the initial observation.
 - When reviewing code, identify the affected component and explain the security impact.
-- When investigating incidents, prioritize evidence collection before conclusions.
+- Do not claim compromise, exploitation, malware, or a vulnerability unless the available evidence supports it.
+- Explicitly state what evidence is missing and what should be collected next.
 - Keep responses concise unless deeper analysis is requested.

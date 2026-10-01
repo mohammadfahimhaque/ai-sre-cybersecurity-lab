@@ -65,6 +65,33 @@ def answer(result, reasoning: bool = False) -> str:
 
     return text[match.start():].strip() if match else text
 
+def file_issue(question: str, hypothesis: str) -> str:
+    repository = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GITHUB_TOKEN")
+
+    if not repository:
+        raise RuntimeError("GITHUB_REPOSITORY is not configured.")
+
+    if not token:
+        raise RuntimeError("GITHUB_TOKEN is not configured.")
+
+    response = httpx2.post(
+        f"https://api.github.com/repos/{repository}/issues",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        json={
+            "title": f"[Security investigation] {question}"[:120],
+            "body": hypothesis,
+        },
+        timeout=30,
+    )
+
+    response.raise_for_status()
+
+    return response.json()["html_url"]
 
 @app.entrypoint
 def invoke(payload: dict) -> dict:
@@ -82,12 +109,19 @@ def invoke(payload: dict) -> dict:
         tools=[bronto],
     )
 
-    result = agent(question)
+    hypothesis = answer(
+        agent(question),
+        reasoning,
+    )
+
+    issue_url = file_issue(
+        question,
+        hypothesis,
+    )
 
     return {
-        "result": answer(result, reasoning)
+        "result": issue_url
     }
-
 
 if __name__ == "__main__":
     app.run()
