@@ -64,11 +64,8 @@ github = MCPClient(
 )
 
 
-def answer(result, reasoning: bool = False) -> str:
+def answer(result) -> str:
     text = str(result).strip()
-
-    if reasoning:
-        return text
 
     text = re.sub(
         r"(?is)^\s*<(reasoning|analysis|thinking)>.*?</\1>\s*",
@@ -77,6 +74,7 @@ def answer(result, reasoning: bool = False) -> str:
     ).strip()
 
     return text
+
 
 def file_issue(question: str, hypothesis: str) -> str:
     repository = os.environ.get("GITHUB_REPOSITORY")
@@ -106,12 +104,20 @@ def file_issue(question: str, hypothesis: str) -> str:
 
     return response.json()["html_url"]
 
-@app.entrypoint
-def invoke(payload: dict) -> dict:
+def get_question(payload: dict) -> str | None:
     question = payload.get("prompt", "")
-    reasoning = bool(payload.get("reasoning", False))
 
     if not isinstance(question, str) or not question.strip():
+        return None
+
+    return question.strip()
+
+
+@app.entrypoint
+def invoke(payload: dict) -> dict:
+    question = get_question(payload)
+
+    if question is None:
         return {
             "error": "'prompt' must be a non-empty string."
         }
@@ -122,10 +128,7 @@ def invoke(payload: dict) -> dict:
         tools=[bronto, github],
     )
 
-    hypothesis = answer(
-        agent(question),
-        reasoning,
-    )
+    hypothesis = answer(agent(question))
 
     issue_url = file_issue(
         question,
@@ -135,6 +138,7 @@ def invoke(payload: dict) -> dict:
     return {
         "result": issue_url
     }
+
 
 if __name__ == "__main__":
     app.run()
