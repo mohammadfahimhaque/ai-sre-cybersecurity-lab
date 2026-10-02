@@ -380,8 +380,8 @@ Claude Haiku 4.5 remains the current default model for this project.
 ### 1. Clone the Repository
 
 ```bash
-git clone git@github.com:mohammadfahimhaque/ai-sre-cybersecurity-lab.git
-cd ai-sre-cybersecurity-lab
+git clone git@github.com:mohammadfahimhaque/cybersecurity-research-agent.git
+cd cybersecurity-research-agent
 ```
 
 ### 2. Prepare Configuration
@@ -399,7 +399,7 @@ BEDROCK_MODEL_ID=us.anthropic.claude-haiku-4-5-20251001-v1:0
 BRONTO_MCP_URL=https://mcp.eu.bronto.io/mcp
 BRONTO_API_KEY=your_bronto_api_key_here
 
-GITHUB_REPOSITORY=mohammadfahimhaque/ai-sre-cybersecurity-lab
+GITHUB_REPOSITORY=mohammadfahimhaque/cybersecurity-research-agent
 ```
 
 Never commit the real `.env` file.
